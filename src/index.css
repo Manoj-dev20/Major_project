@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: #E40000; /* Airtel Red */
+    --primary-hover: #CC0000;
+    --secondary: #0F3CC9; /* Jio Blue */
+    --bg-light: #F8FAFC;
+    --text-main: #0F172A;
+    --text-muted: #64748B;
+  }
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+.card-shadow {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary {
+  @apply bg-red-600 text-white px-6 py-2.5 rounded-lg font-semibold 
+         hover:bg-red-700 transition-all duration-300 shadow-md flex items-center justify-center;
+}
+
+.btn-secondary {
+  @apply bg-white text-red-600 border border-red-600 px-6 py-2.5 rounded-lg font-semibold 
+         hover:bg-red-50 transition-all duration-300 flex items-center justify-center;
+}
+
+.input-field {
+  @apply w-full px-4 py-3 rounded-lg border border-gray-300 bg-white
+         focus:outline-none focus:ring-2 focus:ring-red-500 
+         focus:border-transparent transition-all duration-200 text-gray-800;
+}
