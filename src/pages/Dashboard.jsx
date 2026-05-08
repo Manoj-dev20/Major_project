@@ -1,10 +1,15 @@
 import { useState } from 'react'
-import { Activity, ShieldAlert, Smartphone, Zap, Wifi, CreditCard, ChevronRight, Settings } from 'lucide-react'
+import { Activity, ShieldAlert, Smartphone, Zap, Wifi, CreditCard, ChevronRight, Settings, CheckCircle2 } from 'lucide-react'
+import PaymentModal from '../components/PaymentModal'
 
 function Dashboard({ state }) {
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [billAmount, setBillAmount] = useState('4,250');
+  const [isPaid, setIsPaid] = useState(false);
+
   const quickActions = [
     { icon: Wifi, label: 'Add Device', color: 'bg-blue-100 text-blue-600' },
-    { icon: CreditCard, label: 'Pay Bill', color: 'bg-red-100 text-red-600' },
+    { icon: CreditCard, label: 'Pay Bill', color: 'bg-red-100 text-red-600', action: () => setIsPaymentModalOpen(true) },
     { icon: Zap, label: 'Upgrade Plan', color: 'bg-purple-100 text-purple-600' },
     { icon: Settings, label: 'Settings', color: 'bg-gray-100 text-gray-600' }
   ]
@@ -15,9 +20,14 @@ function Dashboard({ state }) {
     { name: 'Fleet Tracking', status: 'Warning', dataUsed: '48 GB', dataTotal: '50 GB' }
   ]
 
+  const handlePaymentSuccess = () => {
+    setIsPaid(true);
+    setBillAmount('0');
+  }
+
   return (
     <div className="max-w-7xl mx-auto pb-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 px-4 sm:px-0">
         <div>
           <h2 className="text-3xl font-extrabold text-gray-900">My Account</h2>
           <p className="text-gray-500 mt-1">Manage your enterprise services and connected devices</p>
@@ -28,41 +38,50 @@ function Dashboard({ state }) {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid lg:grid-cols-3 gap-6 mb-8 px-4 sm:px-0">
         {/* Main Balance / Plan Card (Like Airtel Thanks app) */}
-        <div className="bg-gradient-to-br from-red-600 to-red-800 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden lg:col-span-2">
+        <div className={`bg-gradient-to-br ${isPaid ? 'from-green-600 to-green-800' : 'from-red-600 to-red-800'} rounded-3xl p-6 text-white shadow-xl relative overflow-hidden lg:col-span-2 transition-colors duration-500`}>
           <div className="absolute top-0 right-0 p-4 opacity-20">
             <Activity className="w-32 h-32" />
           </div>
           <div className="relative z-10">
-            <p className="text-red-100 font-medium mb-1">Current Billing Cycle</p>
+            <p className="text-white/80 font-medium mb-1">{isPaid ? 'Status: All Paid' : 'Current Billing Cycle'}</p>
             <div className="flex items-baseline gap-2 mb-6">
-              <h3 className="text-5xl font-extrabold">₹4,250</h3>
-              <span className="text-red-100">.00</span>
+              <h3 className="text-5xl font-extrabold">₹{billAmount}</h3>
+              <span className="text-white/80">.00</span>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-white/10 rounded-xl p-3 backdrop-blur-md">
-                <p className="text-xs text-red-100 mb-1">Due Date</p>
-                <p className="font-bold text-lg">15 Nov</p>
+                <p className="text-xs text-white/70 mb-1">Due Date</p>
+                <p className="font-bold text-lg">{isPaid ? 'Paid' : '15 Nov'}</p>
               </div>
               <div className="bg-white/10 rounded-xl p-3 backdrop-blur-md">
-                <p className="text-xs text-red-100 mb-1">Active Plan</p>
+                <p className="text-xs text-white/70 mb-1">Active Plan</p>
                 <p className="font-bold text-lg">Enterprise Pro</p>
               </div>
               <div className="bg-white/10 rounded-xl p-3 backdrop-blur-md">
-                <p className="text-xs text-red-100 mb-1">Devices</p>
+                <p className="text-xs text-white/70 mb-1">Devices</p>
                 <p className="font-bold text-lg">1,240</p>
               </div>
               <div className="bg-white/10 rounded-xl p-3 backdrop-blur-md">
-                <p className="text-xs text-red-100 mb-1">Total Data</p>
+                <p className="text-xs text-white/70 mb-1">Total Data</p>
                 <p className="font-bold text-lg">250 GB</p>
               </div>
             </div>
             
-            <button className="bg-white text-red-600 font-bold py-3 px-8 rounded-full hover:bg-gray-50 transition-colors shadow-lg">
-              Pay Bill Now
-            </button>
+            {!isPaid ? (
+              <button 
+                onClick={() => setIsPaymentModalOpen(true)}
+                className="bg-white text-red-600 font-bold py-3 px-8 rounded-full hover:bg-gray-50 transition-all hover:scale-105 shadow-lg active:scale-95"
+              >
+                Pay Bill Now
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 text-green-100 font-bold">
+                <CheckCircle2 className="w-5 h-5" /> Bill Paid Successfully
+              </div>
+            )}
           </div>
         </div>
 
@@ -71,7 +90,11 @@ function Dashboard({ state }) {
           <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
             {quickActions.map((action, i) => (
-              <button key={i} className="flex flex-col items-center justify-center p-4 rounded-2xl hover:bg-gray-50 transition-colors border border-gray-100 group">
+              <button 
+                key={i} 
+                onClick={action.action}
+                className="flex flex-col items-center justify-center p-4 rounded-2xl hover:bg-gray-50 transition-colors border border-gray-100 group"
+              >
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${action.color} group-hover:scale-110 transition-transform`}>
                   <action.icon className="w-6 h-6" />
                 </div>
@@ -82,7 +105,7 @@ function Dashboard({ state }) {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-6 px-4 sm:px-0">
         {/* Active Services List */}
         <div className="bg-white rounded-3xl p-6 card-shadow border border-gray-100 lg:col-span-2">
           <div className="flex justify-between items-center mb-6">
@@ -95,7 +118,7 @@ function Dashboard({ state }) {
           <div className="space-y-4">
             {activeServices.map((service, i) => (
               <div key={i} className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 text-left">
                   <div className="bg-gray-100 p-3 rounded-full text-gray-600">
                     <Smartphone className="w-6 h-6" />
                   </div>
@@ -111,9 +134,9 @@ function Dashboard({ state }) {
                     <span>{service.dataUsed}</span>
                     <span>{service.dataTotal}</span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5">
+                  <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                     <div 
-                      className={`h-1.5 rounded-full ${service.status === 'Active' ? 'bg-blue-500' : 'bg-red-500'}`} 
+                      className={`h-1.5 rounded-full transition-all duration-1000 ${service.status === 'Active' ? 'bg-blue-500' : 'bg-red-500'}`} 
                       style={{ width: `${(parseInt(service.dataUsed) / parseInt(service.dataTotal)) * 100}%` }}
                     ></div>
                   </div>
@@ -143,6 +166,13 @@ function Dashboard({ state }) {
            </div>
         </div>
       </div>
+
+      <PaymentModal 
+        isOpen={isPaymentModalOpen} 
+        onClose={() => setIsPaymentModalOpen(false)} 
+        amount={billAmount}
+        onSuccess={handlePaymentSuccess}
+      />
     </div>
   )
 }
